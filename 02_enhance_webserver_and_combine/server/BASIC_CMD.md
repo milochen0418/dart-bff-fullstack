@@ -1,8 +1,12 @@
 # command
-
+- $ dart pub cache clean 
+  - clean the installed dependency  
 - $ dart pub get  
-  - Install dependency  
+  - Install dependency   
+- $ yes | dart pub get  
+  - Install dependency without asking y/N. 
 - $ dart run 
-  - run for ./bin/hellotermproj.dart  
-  - then you can open the most basic web server 
-
+  - run for ./bin/startserver.dart  
+  - then you can open the most basic web server   
+- $ dart test  
+  - run the test code in ./test/server_test.dart  
