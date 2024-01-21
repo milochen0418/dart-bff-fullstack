@@ -1,11 +1,8 @@
-import 'package:shelf/shelf.dart';
-import 'package:shelf/shelf_io.dart' as io;
+import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'package:startserver/startserver.dart';
 
 void main() async {
-  var handler = const Pipeline().addMiddleware(logRequests()).addHandler(_echoRequest);
-
-  var server = await io.serve(handler, 'localhost', 8080);
-  print('Serving at http://${server.address.host}:${server.port}');
+  var server = await createServer();
+  await shelf_io.serve(server, 'localhost', 8080);
+  print('Server running on localhost:8080');
 }
-
-Response _echoRequest(Request request) => Response.ok('Hello, World!');

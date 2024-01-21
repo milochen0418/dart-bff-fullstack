@@ -258,7 +258,7 @@ google-services.json
 .metadata
 README.md
 analysis_options.yaml
-test/
+#test/ # for dart run the bin/startserver.dart. the folder test/ is we we need 
 macos/
 linux/
 windows/
