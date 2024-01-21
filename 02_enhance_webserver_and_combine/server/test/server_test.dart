@@ -3,6 +3,10 @@ import 'package:startserver/server.dart';
 import 'package:shelf/shelf.dart';
 
 void main() {
+  test('Integer addition', () {
+    expect(1 + 1, equals(2));
+  });
+  
   test('GET /hello returns Hello, world!', () async {
     var server = createServer();
 
