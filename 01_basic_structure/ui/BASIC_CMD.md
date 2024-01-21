@@ -158,4 +158,6 @@ $ flutter run -d Chrome
     cli-animations: (Not set)
     enable-native-assets: (Not set) (Unavailable)
 - $ flutter config --enable-windows-desktop   
-  - 透過這命令可以使得 enable-windows-desktop 變為 true  
+  - 透過這命令可以使得 enable-windows-desktop 變為 true     
+- $ ./create_platforms.sh   
+  - 透過這個 script 可以將所有目前支持 platform 都建立好  
