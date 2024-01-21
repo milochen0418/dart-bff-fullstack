@@ -17,6 +17,8 @@ class _MyAppState extends State<MyApp> {
 
   void _getRandomString() async {
     final response = await http.get(Uri.parse('http://localhost:8080/randomString'));
+    //In the android emulator , you need to do `adb reverse tcp:8080 tcp:8080`
+    
     if (response.statusCode == 200) {
       setState(() {
         _randomString = response.body;
