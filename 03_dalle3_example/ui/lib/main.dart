@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
 void main() {
   runApp(const MyApp());
 }
@@ -14,7 +15,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  //String imageUrl = '';
+  
   String imageUrl = 'https://picsum.photos/250?image=9';
   final TextEditingController promptController = TextEditingController();
   void generateImage() async {
@@ -49,50 +50,52 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blueGrey,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Dart server +Flutter UI '),
+          title: const Text('Dart server + Flutter UI'),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min, // 將 Column 的大小設為最小
-            children: [
-              const Text(
-                'Hello DALLE-3 Flutter BFF App',
-                style: TextStyle(fontSize: 24),
-              ),
-              const SizedBox(height: 20), // 添加一些空間
-              TextField(controller: promptController),
-              const SizedBox(height: 20), // 添加一些空間
-              ElevatedButton(
-                onPressed: generateImage,
-                child: Text('Generate Image'),
-              ),              
-              const SizedBox(height: 20), // 添加一些空間
-              //if (imageUrl.isNotEmpty) Image.network(imageUrl),
-              if (imageUrl.isNotEmpty)
-                Flexible(
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.scaleDown, // 確保圖像縮放不失真
+        body: SingleChildScrollView( // 允许滚动
+          padding: const EdgeInsets.all(20.0),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Hello DALLE-3 Flutter BFF App',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: promptController,
+                  decoration: InputDecoration(
+                    labelText: 'Enter Prompt',
+                    border: OutlineInputBorder(),
                   ),
                 ),
-
-              /*             
-              Image.network(
-                'https://picsum.photos/250?image=9',
-              ),*/
-              ElevatedButton(
-                onPressed: _getRandomString,
-                child: const Text('Get Server BFF Random'),
-              ),
-              const SizedBox(height: 20),
-              Text(_randomString),
-            ],
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: generateImage,
+                  child: const Text('Generate Image'),
+                ),
+                const SizedBox(height: 20),
+                Image.network(imageUrl),  
+                const Divider(height: 40),
+                ElevatedButton(
+                  onPressed: _getRandomString,
+                  child: const Text('Get Server BFF Random'),
+                ),
+                const SizedBox(height: 20),
+                Text(_randomString),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
 }
