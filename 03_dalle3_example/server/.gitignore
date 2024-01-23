@@ -268,3 +268,6 @@ ios/
 
 
 # flutter run .gitignore for windows,android,ios
+
+# for dotenv
+.env

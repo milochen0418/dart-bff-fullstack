@@ -1,9 +1,12 @@
 import 'dart:math';
 import 'dart:convert';
 import 'dart:io';
+//import 'package:dotenv/dotenv.dart' show load, env;
+import 'package:dotenv/dotenv.dart' show load, env;
 import 'package:openai_dart/openai_dart.dart';
 import 'package:shelf/shelf.dart';
 import 'package:http/http.dart' as http;
+
 
 Future<Response> routesHandler(Request request) async {
   if (request.url.path == 'hello') {
@@ -24,14 +27,15 @@ String _generateRandomString(int length) {
 }
 
 Future<Response> _echoRequest(Request request) async {
+  load(); // 載入 .env 檔案
   try {
     // 注释掉了原来获取环境变量的代码
-    final openaiApiKey = Platform.environment['OPENAI_API_KEY'];
-
+    //final openaiApiKey = Platform.environment['OPENAI_API_KEY'];
+    final openaiApiKey = env['OPENAI_API_KEY'];
     // 使用硬编码的 API 密钥（出于安全考虑，建议使用环境变量或其他安全方式）
     //final openaiApiKey = "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";
     //print('openaiApiKey is ' + openaiApiKey);
-    
+     
     // 检查 API 密钥是否为空
     if (openaiApiKey == null) {
       print('API key is null');
@@ -39,10 +43,6 @@ Future<Response> _echoRequest(Request request) async {
     } else {
       print("API key is found. Proceeding to generate image.");
     }
-
-
-
-
     
     // 读取请求内容
     final content = await request.readAsString();
