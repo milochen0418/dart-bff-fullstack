@@ -70,7 +70,14 @@ class _MyAppState extends State<MyApp> {
                 child: Text('Generate Image'),
               ),              
               const SizedBox(height: 20), // 添加一些空間
-              if (imageUrl.isNotEmpty) Image.network(imageUrl),
+              //if (imageUrl.isNotEmpty) Image.network(imageUrl),
+              if (imageUrl.isNotEmpty)
+                Flexible(
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.scaleDown, // 確保圖像縮放不失真
+                  ),
+                ),
 
               /*             
               Image.network(
