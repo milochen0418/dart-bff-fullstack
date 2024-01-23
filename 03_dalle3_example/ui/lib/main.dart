@@ -17,19 +17,30 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   
   String imageUrl = 'https://picsum.photos/250?image=9';
+  bool isLoading = false;
   final TextEditingController promptController = TextEditingController();
-  void generateImage() async {
-    var response = await http.post(
-      Uri.parse('http://localhost:8080/generate'),
-      body: {'prompt': promptController.text},
-    );
-    if (response.statusCode == 200) {
-      var data = json.decode(response.body);
-      setState(() {
-        imageUrl = data['imageUrl'];
-      });
-    }
+void generateImage() async {
+  setState(() {
+    isLoading = true; // 开始加载时设置为true
+  });
+
+  var response = await http.post(
+    Uri.parse('http://localhost:8080/generate'),
+    body: {'prompt': promptController.text},
+  );
+
+  if (response.statusCode == 200) {
+    var data = json.decode(response.body);
+    setState(() {
+      imageUrl = data['imageUrl'];
+      isLoading = false; // 加载完成后设置为false
+    });
+  } else {
+    setState(() {
+      isLoading = false; // 出错时也要设置为false
+    });
   }
+}
 
   String _randomString = '';
 
@@ -82,7 +93,13 @@ class _MyAppState extends State<MyApp> {
                   child: const Text('Generate Image'),
                 ),
                 const SizedBox(height: 20),
-                Image.network(imageUrl),  
+
+                isLoading
+                ? CircularProgressIndicator() // 顯示進度指示器
+                : Image.network(imageUrl), // 否則顯示圖片
+                const SizedBox(height: 20),
+
+                //Image.network(imageUrl),  
                 const Divider(height: 40),
                 ElevatedButton(
                   onPressed: _getRandomString,
