@@ -1,11 +1,8 @@
 import 'dart:math';
 import 'dart:convert';
-import 'dart:io';
-//import 'package:dotenv/dotenv.dart' show load, env;
 import 'package:dotenv/dotenv.dart' show load, env;
 import 'package:openai_dart/openai_dart.dart';
 import 'package:shelf/shelf.dart';
-import 'package:http/http.dart' as http;
 
 
 Future<Response> routesHandler(Request request) async {

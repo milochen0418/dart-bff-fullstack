@@ -82,7 +82,7 @@ void generateImage() async {
                 const SizedBox(height: 20),
                 TextField(
                   controller: promptController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Enter Prompt',
                     border: OutlineInputBorder(),
                   ),
@@ -95,7 +95,7 @@ void generateImage() async {
                 const SizedBox(height: 20),
 
                 isLoading
-                ? CircularProgressIndicator() // 顯示進度指示器
+                ? const CircularProgressIndicator() // 顯示進度指示器
                 : Image.network(imageUrl), // 否則顯示圖片
                 const SizedBox(height: 20),
 
