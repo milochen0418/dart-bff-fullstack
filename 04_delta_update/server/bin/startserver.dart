@@ -6,8 +6,8 @@ class GameState {
 
   String getState() => jsonEncode(state);
 
-  void update(String player, dynamic data) {
-    state[player] = data;
+  void update(String clientKey, dynamic data) {
+    state[clientKey] = data; // 使用 clientKey 作為唯一標識
   }
 }
 
@@ -17,25 +17,25 @@ void main() async {
   var sockets = <WebSocket>[];
 
   server.transform(WebSocketTransformer()).listen((WebSocket socket) {
+    var clientKey = socket.hashCode.toString(); // 為每個客戶端生成一個唯一標識符
+
     sockets.add(socket);
-    socket.add(gameState.getState()); // Send current state on new connection
+    socket.add(gameState.getState()); // 發送當前狀態
 
     socket.listen((data) {
-      print('Received message: $data');  // 打印接收到的訊息
+      print('Received message: $data');
       try {
-        var jsonData = jsonDecode(data); // Attempt to decode JSON
-        gameState.update('player', jsonData); // Update state
+        var jsonData = jsonDecode(data);
+        gameState.update(clientKey, jsonData); // 使用 clientKey 更新狀態
+        sockets.forEach((s) {
+          s.add(gameState.getState());
+        });
       } catch (e) {
         print('Error parsing JSON: $e');
-        // Handle non-JSON data or other errors
       }
-
-      // Broadcast updated state to all connected clients
-      sockets.forEach((s) {
-        s.add(gameState.getState());
-      });
     }, onDone: () {
-      sockets.remove(socket); // Remove socket on disconnection
+      sockets.remove(socket);
+      gameState.state.remove(clientKey); // 斷線時移除對應的狀態
     });
   });
 
