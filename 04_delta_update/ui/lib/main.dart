@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'dart:io';
 
 void main() => runApp(MyApp());
@@ -19,8 +20,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late WebSocket _webSocket;
-  String _serverMessage = '';
+  WebSocket? _webSocket;
+  String _serverMessage = 'No data received';
+  TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -29,19 +31,59 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _connectToServer() async {
-    _webSocket = await WebSocket.connect('ws://localhost:4040');
-    _webSocket.listen((data) {
-      setState(() {
-        _serverMessage = data;
+    try {
+      _webSocket = await WebSocket.connect('ws://localhost:4040');
+      _webSocket!.listen((data) {
+        setState(() {
+          _serverMessage = data;
+        });
       });
-    });
+    } catch (e) {
+      setState(() {
+        _serverMessage = "Error: ${e.toString()}";
+      });
+    }
+  }
+
+  void _sendMessage() {
+    /*
+    if (_webSocket != null && _controller.text.isNotEmpty) {
+      _webSocket!.add(_controller.text);
+    }*/
+    if (_webSocket != null && _controller.text.isNotEmpty) {
+      var message = jsonEncode({"message": _controller.text});
+      _webSocket!.add(message);
+    }    
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('WebSocket Demo')),
-      body: Center(child: Text('Server says: $_serverMessage')),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text('Server says: $_serverMessage'),
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(labelText: 'Send a message'),
+            ),
+            ElevatedButton(
+              onPressed: _sendMessage,
+              child: Text('Send'),
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _webSocket?.close();
+    _controller.dispose();
+    super.dispose();
   }
 }

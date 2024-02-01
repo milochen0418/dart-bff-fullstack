@@ -21,9 +21,18 @@ void main() async {
     socket.add(gameState.getState()); // Send current state on new connection
 
     socket.listen((data) {
-      gameState.update('player', jsonDecode(data)); // Update state
+      print('Received message: $data');  // 打印接收到的訊息
+      try {
+        var jsonData = jsonDecode(data); // Attempt to decode JSON
+        gameState.update('player', jsonData); // Update state
+      } catch (e) {
+        print('Error parsing JSON: $e');
+        // Handle non-JSON data or other errors
+      }
+
+      // Broadcast updated state to all connected clients
       sockets.forEach((s) {
-        s.add(gameState.getState()); // Broadcast updated state
+        s.add(gameState.getState());
       });
     }, onDone: () {
       sockets.remove(socket); // Remove socket on disconnection
