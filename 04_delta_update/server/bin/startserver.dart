@@ -3,11 +3,25 @@ import 'dart:convert';
 
 class GameState {
   Map<String, dynamic> state = {};
+  Map<String, DateTime> lastUpdated = {};
 
-  String getState() => jsonEncode(state);
+  // 獲取狀態的 Delta 更新
+  String getStateDelta(String clientKey) {
+    final lastUpdateTime = lastUpdated[clientKey] ?? DateTime.fromMillisecondsSinceEpoch(0);
+    var delta = state.entries.where((entry) {
+      // 確保在比較之前將 timestamp 從字符串轉換為 DateTime
+      var timestamp = DateTime.tryParse(entry.value['timestamp'] ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return timestamp.isAfter(lastUpdateTime);
+    }).map((entry) => MapEntry(entry.key, entry.value));
 
-  void update(String clientKey, dynamic data) {
-    state[clientKey] = data; // 使用 clientKey 作為唯一標識
+    lastUpdated[clientKey] = DateTime.now();
+    return jsonEncode(Map.fromEntries(delta));
+  }
+
+  void update(String key, dynamic value) {
+   // 將 DateTime 對象轉換為 ISO 8601 格式的字符串
+    value['timestamp'] = DateTime.now().toIso8601String();
+    state[key] = value;    
   }
 }
 
@@ -17,25 +31,26 @@ void main() async {
   var sockets = <WebSocket>[];
 
   server.transform(WebSocketTransformer()).listen((WebSocket socket) {
-    var clientKey = socket.hashCode.toString(); // 為每個客戶端生成一個唯一標識符
-
+    var clientKey = socket.hashCode.toString();
     sockets.add(socket);
-    socket.add(gameState.getState()); // 發送當前狀態
+
+    // 發送當前或 Delta 狀態
+    socket.add(gameState.getStateDelta(clientKey));
 
     socket.listen((data) {
       print('Received message: $data');
       try {
         var jsonData = jsonDecode(data);
-        gameState.update(clientKey, jsonData); // 使用 clientKey 更新狀態
+        gameState.update(clientKey, jsonData);
         sockets.forEach((s) {
-          s.add(gameState.getState());
+          s.add(gameState.getStateDelta(s.hashCode.toString()));
         });
       } catch (e) {
         print('Error parsing JSON: $e');
       }
     }, onDone: () {
       sockets.remove(socket);
-      gameState.state.remove(clientKey); // 斷線時移除對應的狀態
+      gameState.lastUpdated.remove(clientKey);
     });
   });
 
