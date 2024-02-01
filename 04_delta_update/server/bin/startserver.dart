@@ -1,9 +1,34 @@
-import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'package:startserver/server.dart';
+import 'dart:io';
+import 'dart:convert';
+
+class GameState {
+  Map<String, dynamic> state = {};
+
+  String getState() => jsonEncode(state);
+
+  void update(String player, dynamic data) {
+    state[player] = data;
+  }
+}
 
 void main() async {
-  print('run startserver.dart');
-  var server = await createServer();
-  await shelf_io.serve(server, 'localhost', 8080);
-  print('Server running on localhost:8080');
+  var gameState = GameState();
+  var server = await HttpServer.bind(InternetAddress.loopbackIPv4, 4040);
+  var sockets = <WebSocket>[];
+
+  server.transform(WebSocketTransformer()).listen((WebSocket socket) {
+    sockets.add(socket);
+    socket.add(gameState.getState()); // Send current state on new connection
+
+    socket.listen((data) {
+      gameState.update('player', jsonDecode(data)); // Update state
+      sockets.forEach((s) {
+        s.add(gameState.getState()); // Broadcast updated state
+      });
+    }, onDone: () {
+      sockets.remove(socket); // Remove socket on disconnection
+    });
+  });
+
+  print('Server running on ws://localhost:4040');
 }
