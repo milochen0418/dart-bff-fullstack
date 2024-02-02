@@ -23,10 +23,15 @@ void generateImage() async {
   setState(() {
     isLoading = true; // 开始加载时设置为true
   });
-
+  /*
   var response = await http.post(
     Uri.parse('http://localhost:8080/generate'),
     body: {'prompt': promptController.text},
+  );*/
+  var response = await http.post(
+    Uri.parse('http://localhost:8080/generate'),
+    headers: {"Content-Type": "application/json; charset=UTF-8"},
+    body: json.encode({'prompt': promptController.text}),
   );
 
   if (response.statusCode == 200) {
